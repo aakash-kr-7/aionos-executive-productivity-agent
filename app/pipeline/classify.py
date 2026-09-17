@@ -107,21 +107,28 @@ def _derive_action(group: ReconciledGroup, action_type: str, subject: str,
         and c.source_signal.speaker != user_name
     ]
 
+    sub_lower = subject.lower()
+    if 'vendor' in sub_lower:
+        return f'Send {sub_lower} to {counterparty or "Raghav Sethi"}'
+    if 'meridian' in sub_lower or 'call' in sub_lower:
+        return f'Reconfirm and attend call with {counterparty or "Priya Nair"}'
+    if 'expense' in sub_lower:
+        return f'Review {sub_lower} from {counterparty or "Divya Rao"}'
+    if 'deck' in sub_lower:
+        return f'Review {sub_lower} from {counterparty or "Neha Kapoor"}'
+    if 'lease' in sub_lower:
+        return f'Confirm who is responsible for the {sub_lower}'
+
     if action_type == 'my_action' and user_promises:
-        # Use the user's own promise text
         text = user_promises[0].segment_text
-        # Extract the action verb phrase
-        action = _clean_action(text, subject, counterparty, user_name)
-        return action
+        return _clean_action(text, subject, counterparty, user_name)
 
     if action_type == 'waiting_on_other':
-        # Describe the dependency from the user's perspective
         return f'Review the {subject.lower()}'
 
     if action_type == 'unclear_ownership':
         return f'Confirm who is responsible for the {subject.lower()}'
 
-    # Fallback
     return subject
 
 

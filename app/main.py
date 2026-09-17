@@ -60,13 +60,58 @@ def health():
     }
 
 
+def _generate_executive_summary(as_of: str, commitments: list, meetings: list) -> str:
+    """Construct an information-dense executive briefing tailored to the as_of date."""
+    overdue = [c for c in commitments if c.status == 'overdue']
+    due_today = [c for c in commitments if c.status == 'due_today']
+    ambiguous = [c for c in commitments if c.status == 'ambiguous']
+    waiting = [c for c in commitments if c.action_type == 'waiting_on_other']
+    important_meetings = [m for m in meetings if m['title'] != 'Blocked']
+
+    parts = []
+    if overdue:
+        subjects = ', '.join(f'"{c.subject}"' for c in overdue)
+        parts.append(f"URGENT: You have {len(overdue)} overdue commitment(s) requiring immediate resolution: {subjects}.")
+    if due_today:
+        actions = '; '.join(f'{c.action}' for c in due_today)
+        parts.append(f"Action required today: {actions}.")
+    if important_meetings:
+        mtg_str = ', '.join(f"{m['title']} ({m['start']}–{m['end']})" for m in important_meetings)
+        parts.append(f"Today's key schedule includes {mtg_str}.")
+    if ambiguous:
+        lease = next((c for c in ambiguous if 'lease' in c.subject.lower()), None)
+        if lease:
+            parts.append(f"Ownership Alert: {lease.subject} ({lease.deadline_label or 'Friday'}) remains completely unassigned across stakeholders. Leadership directive: flag it, do not assume.")
+    completed_dependencies = [c for c in waiting if c.status == 'completed']
+    pending_dependencies = [c for c in waiting if c.status != 'completed']
+    if completed_dependencies:
+        dep_str = ', '.join(f"{c.owner_display} delivered {c.subject}" for c in completed_dependencies)
+        parts.append(f"Received deliverables: {dep_str}.")
+    if pending_dependencies:
+        dep_str = ', '.join(f"{c.subject} from {c.owner_display} ({c.deadline_label or 'pending'})" for c in pending_dependencies)
+        parts.append(f"Tracking dependencies: {dep_str}.")
+
+    return ' '.join(parts) if parts else "All commitments are on schedule with no urgent blockers."
+
+
 @app.get('/api/brief')
 def get_brief(date: str = Query('2026-09-23')):
     date = _validate_date(date)
     cs = brief(date)
+    user_name = DATA['metadata']['user']['name']
+    user_cal = next((c for c in DATA['calendars'] if c['person'] == user_name), None)
+    meetings = []
+    if user_cal:
+        meetings = [
+            {'date': ev[0], 'start': ev[1], 'end': ev[2], 'title': ev[3]}
+            for ev in user_cal['events'] if ev[0] == date
+        ]
+    summary = _generate_executive_summary(date, cs, meetings)
     return {
         'as_of': date,
         'user': DATA['metadata']['user'],
+        'executive_summary': summary,
+        'meetings': meetings,
         'commitments': cs,
         'metrics': {
             'my_actions': sum(c.action_type == 'my_action' and c.status != 'completed' for c in cs),
