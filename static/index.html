@@ -7,7 +7,7 @@
   <meta name="description" content="Grounded executive action console for commitment extraction, ownership disambiguation, and multi-source cross-reconciliation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -16,14 +16,14 @@
     <header class="app-header">
       <div class="header-left">
         <div class="brand-eyebrow">
-          <span class="pulse-indicator"></span>
-          <span>AIONOS AGENTIC AI FACTORY &bull; EXECUTIVE INTELLIGENCE CONSOLE</span>
+          <span class="dot"></span>
+          <span>AIONOS Executive Operating System</span>
         </div>
         <div class="executive-profile">
           <div class="avatar">AM</div>
           <div>
             <h1 class="brand-title">Arjun Malhotra</h1>
-            <div class="executive-role">VP Sales &bull; Veridian Corp &bull; Active Workspace: Exercise Week 2026</div>
+            <div class="executive-role">VP Sales &bull; Veridian Corp</div>
           </div>
         </div>
       </div>
@@ -31,28 +31,28 @@
       <!-- Time Travel & As-Of Date Control -->
       <div class="date-navigator">
         <div class="date-header">
-          <span class="date-label">SIMULATED AS-OF DATE</span>
+          <span class="date-label">As of date:</span>
           <span class="active-date-tag" id="activeDateDisplay">Wednesday, 23 Sep 2026</span>
         </div>
         <div class="date-pills" id="datePills">
           <button class="date-pill" data-date="2026-09-21">
-            <span class="d-day">MON</span>
+            <span class="d-day">Mon</span>
             <span class="d-num">21</span>
           </button>
           <button class="date-pill" data-date="2026-09-22">
-            <span class="d-day">TUE</span>
+            <span class="d-day">Tue</span>
             <span class="d-num">22</span>
           </button>
           <button class="date-pill active" data-date="2026-09-23">
-            <span class="d-day">WED</span>
+            <span class="d-day">Wed</span>
             <span class="d-num">23</span>
           </button>
           <button class="date-pill" data-date="2026-09-24">
-            <span class="d-day">THU</span>
+            <span class="d-day">Thu</span>
             <span class="d-num">24</span>
           </button>
           <button class="date-pill" data-date="2026-09-25">
-            <span class="d-day">FRI</span>
+            <span class="d-day">Fri</span>
             <span class="d-num">25</span>
           </button>
         </div>
@@ -61,46 +61,30 @@
 
     <!-- Global Navigation Tabs -->
     <nav class="console-nav">
-      <button class="nav-tab active" data-tab="brief">
-        <span class="tab-icon">&#9638;</span>
-        <span>Executive Brief &amp; Action Console</span>
-      </button>
-      <button class="nav-tab" data-tab="timeline">
-        <span class="tab-icon">&#128337;</span>
-        <span>Timeline &amp; Deadlines</span>
-      </button>
-      <button class="nav-tab" data-tab="pipeline">
-        <span class="tab-icon">&#9881;</span>
-        <span>8-Stage Pipeline Inspector</span>
-      </button>
-      <button class="nav-tab" data-tab="evidence">
-        <span class="tab-icon">&#128196;</span>
-        <span>Source Evidence Matrix</span>
-      </button>
-      <button class="nav-tab" data-tab="audit">
-        <span class="tab-icon">&#128065;</span>
-        <span>Audit Trail</span>
-      </button>
+      <button class="nav-tab active" data-tab="brief">Overview &amp; Actions</button>
+      <button class="nav-tab" data-tab="timeline">Deadlines &amp; Timeline</button>
+      <button class="nav-tab" data-tab="pipeline">Pipeline Inspector</button>
+      <button class="nav-tab" data-tab="evidence">Source Evidence</button>
+      <button class="nav-tab" data-tab="audit">Audit Trail</button>
     </nav>
 
     <!-- MAIN CONSOLE CONTAINER -->
     <main class="main-content">
       <!-- =========================================================================
-           PANEL 1: EXECUTIVE BRIEF & ACTION CONSOLE
+           PANEL 1: OVERVIEW & ACTIONS
            ========================================================================= -->
       <section id="brief" class="panel active">
-        <!-- Chief of Staff Executive Brief Banner -->
+        <!-- Chief of Staff Executive Daily Brief -->
         <div class="brief-synthesizer">
           <div class="synthesizer-badge">
-            <span class="badge-icon">&#129302;</span>
-            <span>CHIEF OF STAFF EXECUTIVE SUMMARY &bull; WHAT YOU NEED TO KNOW NOW</span>
+            <span>Executive Daily Brief</span>
           </div>
           <div class="synthesizer-text" id="executiveSummary">
-            Synthesizing grounded multi-source brief for Arjun Malhotra…
+            Synthesizing multi-source brief for Arjun Malhotra…
           </div>
         </div>
 
-        <!-- KPI Metrics Ribbon -->
+        <!-- Metrics Ribbon -->
         <div class="metrics-ribbon" id="metricsRibbon"></div>
 
         <!-- 2-Column Command Center Grid -->
@@ -109,9 +93,9 @@
           <div class="action-column">
             <!-- Filter Bar -->
             <div class="category-filter-bar">
-              <span class="filter-title">Show:</span>
+              <span class="filter-title">Filter:</span>
               <div class="filter-tabs" id="filterTabs">
-                <button class="filter-tab active" data-filter="all">All Items (<span id="countAll">5</span>)</button>
+                <button class="filter-tab active" data-filter="all">All (<span id="countAll">5</span>)</button>
                 <button class="filter-tab" data-filter="my_action">My Actions (<span id="countMyActions">2</span>)</button>
                 <button class="filter-tab" data-filter="waiting_on_other">Waiting on Others (<span id="countWaiting">2</span>)</button>
                 <button class="filter-tab" data-filter="unclear_ownership">Unclear Ownership (<span id="countUnclear">1</span>)</button>
@@ -119,7 +103,7 @@
               </div>
             </div>
 
-            <!-- Urgent / Overdue Banner (Visible when items are overdue) -->
+            <!-- Urgent / Overdue Banner -->
             <div id="urgentAlertBox" class="urgent-alert-box" style="display: none;"></div>
 
             <!-- Grouped Action Queues Container -->
@@ -131,10 +115,7 @@
             <!-- Widget 1: Today's Schedule & Meetings -->
             <div class="sidebar-widget">
               <div class="widget-header">
-                <div class="widget-title">
-                  <span class="widget-icon">&#128197;</span>
-                  <span>Today's Schedule &amp; Meetings</span>
-                </div>
+                <div class="widget-title">Today's Schedule</div>
                 <span class="widget-sub" id="meetingCountTag">0 Events</span>
               </div>
               <div id="todayMeetingsList" class="meetings-list"></div>
@@ -143,17 +124,14 @@
             <!-- Widget 2: Grounded Q&A Assistant -->
             <div class="sidebar-widget qa-widget">
               <div class="widget-header">
-                <div class="widget-title">
-                  <span class="widget-icon">&#128172;</span>
-                  <span>Ask the Agent</span>
-                </div>
-                <span class="grounded-tag">ZERO HALLUCINATIONS</span>
+                <div class="widget-title">Ask the Agent</div>
+                <span class="grounded-tag">Grounded</span>
               </div>
-              <p class="widget-description">Answers are strictly bounded to the Data Pack. Refuses to guess unassigned ownership or unconfirmed facts.</p>
+              <p class="widget-description">Direct answers bounded strictly to the data pack. Never invents missing facts or ownership.</p>
               
               <!-- Fast Executive Chips -->
               <div class="executive-chips">
-                <div class="chips-header">EXECUTIVE QUERIES:</div>
+                <div class="chips-header">Quick Queries</div>
                 <button class="chip-btn" data-query="What did I promise Raghav?">What did I promise Raghav?</button>
                 <button class="chip-btn" data-query="What needs action today?">What needs action today?</button>
                 <button class="chip-btn" data-query="Who owns the Mumbai lease?">Who owns the Mumbai lease?</button>
@@ -164,9 +142,9 @@
               <!-- Input Form -->
               <div class="qa-input-wrapper">
                 <textarea id="qaInput" rows="2" placeholder="Ask about commitments, deadlines, or dependencies…"></textarea>
-                <button id="qaSubmitBtn" class="btn btn-primary btn-ask">
+                <button id="qaSubmitBtn" class="btn-ask">
                   <span>Query Agent</span>
-                  <span class="arrow-symbol">&rarr;</span>
+                  <span>&rarr;</span>
                 </button>
               </div>
 
@@ -178,102 +156,102 @@
       </section>
 
       <!-- =========================================================================
-           PANEL 2: TIMELINE & DEADLINES
+           PANEL 2: DEADLINES & TIMELINE
            ========================================================================= -->
       <section id="timeline" class="panel">
         <div class="panel-header">
-          <h2>Executive Timeline &amp; Deadline Calendar</h2>
-          <p class="text-secondary">Chronological view of commitments, agreed deadlines, and historical slippages across the exercise week (21–25 Sep 2026).</p>
+          <h2>Deadlines &amp; Timeline</h2>
+          <p>Chronological view of commitments, agreed deadlines, and historical slippage across the exercise week.</p>
         </div>
         <div id="timelineContainer" class="timeline-container"></div>
       </section>
 
       <!-- =========================================================================
-           PANEL 3: 8-STAGE PIPELINE INSPECTOR
+           PANEL 3: PIPELINE INSPECTOR
            ========================================================================= -->
       <section id="pipeline" class="panel">
         <div class="panel-header">
-          <h2>8-Stage Perception-to-Action Pipeline</h2>
-          <p class="text-secondary">Deterministic multi-stage architecture. Every transition maintains typed dataclass boundaries and auditable state machines.</p>
+          <h2>8-Stage Pipeline Inspector</h2>
+          <p>Deterministic perception-to-action pipeline with auditable state transitions and typed contracts.</p>
         </div>
 
         <div class="pipeline-diagram">
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 01</div>
             <div class="stage-title">Ingest</div>
-            <div class="stage-meta" id="statSignals">70 Signals Normalized</div>
-            <div class="stage-desc">Standardizes transcripts, emails, calendars, and voice notes into uniform records.</div>
+            <div class="stage-meta" id="statSignals">70 Signals</div>
+            <div class="stage-desc">Normalizes transcripts, emails, calendars, and voice memos into uniform records.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 02</div>
             <div class="stage-title">Extract</div>
-            <div class="stage-meta" id="statCandidates">34 Candidates Extracted</div>
-            <div class="stage-desc">Regex detectors for promises, requests, confirmations, and discourse boundaries.</div>
+            <div class="stage-meta" id="statCandidates">34 Candidates</div>
+            <div class="stage-desc">Rule detectors for promises, requests, confirmations, and discourse boundaries.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 03</div>
             <div class="stage-title">Resolve</div>
-            <div class="stage-meta">4 Canonical People</div>
-            <div class="stage-desc">Maps aliases, first names, and email domains to authoritative people directory.</div>
+            <div class="stage-meta">4 People</div>
+            <div class="stage-desc">Maps aliases, first names, and email domains to authoritative directory.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 04</div>
             <div class="stage-title">Temporal</div>
-            <div class="stage-meta">ISO-8601 Datetimes</div>
-            <div class="stage-desc">Resolves relative phrases (tomorrow morning, Wed 3 PM) to absolute timestamps.</div>
+            <div class="stage-meta">ISO Timestamps</div>
+            <div class="stage-desc">Resolves relative phrases (tomorrow morning, Wed 3 PM) to absolute times.</div>
           </div>
         </div>
 
-        <div class="pipeline-diagram" style="margin-top: 14px;">
+        <div class="pipeline-diagram" style="margin-top: 10px;">
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 05</div>
             <div class="stage-title">Reconcile</div>
-            <div class="stage-meta" id="statGroups">5 Groups Clustered</div>
+            <div class="stage-meta" id="statGroups">5 Clusters</div>
             <div class="stage-desc">Cross-source deduplication via Jaccard token overlap &amp; counterparty matching.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 06</div>
             <div class="stage-title">Classify</div>
-            <div class="stage-meta">Strict Ownership Gating</div>
+            <div class="stage-meta">Strict Gating</div>
             <div class="stage-desc">Separates executive action from waiting-on; preserves unassigned lease ownership.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 07</div>
             <div class="stage-title">Status Engine</div>
-            <div class="stage-meta">Dynamic as_of Evaluation</div>
+            <div class="stage-meta">Dynamic as-of</div>
             <div class="stage-desc">Detects overdue transitions, completed deliverables, and deadline slippage.</div>
           </div>
           <div class="stage-arrow">&rarr;</div>
           <div class="pipeline-stage-card">
             <div class="stage-tag">STAGE 08</div>
             <div class="stage-title">Prioritize</div>
-            <div class="stage-meta">Calibrated Confidence</div>
-            <div class="stage-desc">Ranks operational urgency and computes confidence (0.70–0.99) from evidence depth.</div>
+            <div class="stage-meta">Confidence Score</div>
+            <div class="stage-desc">Ranks operational urgency and computes confidence from evidence depth.</div>
           </div>
         </div>
 
-        <!-- Live Pipeline Trace & Stage Audit Viewer -->
+        <!-- Live Pipeline Trace Viewer -->
         <div class="live-trace-box">
           <div class="trace-toolbar">
-            <div class="trace-title">Live Execution Trace (/api/pipeline-trace)</div>
-            <button id="refreshTraceBtn" class="btn btn-secondary btn-sm">Refresh Trace</button>
+            <div class="trace-title">Execution Trace (/api/pipeline-trace)</div>
+            <button id="refreshTraceBtn" class="btn-ask" style="padding: 4px 10px; font-size: 11px;">Refresh Trace</button>
           </div>
           <pre id="pipelineTracePre" class="trace-pre">Loading pipeline trace…</pre>
         </div>
       </section>
 
       <!-- =========================================================================
-           PANEL 4: SOURCE EVIDENCE MATRIX
+           PANEL 4: SOURCE EVIDENCE
            ========================================================================= -->
       <section id="evidence" class="panel">
         <div class="panel-header">
           <h2>Source Evidence Matrix</h2>
-          <p class="text-secondary">Authoritative data pack registry. Every commitment maps back to specific signal IDs and verbatim excerpts.</p>
+          <p>Authoritative raw data registry. Every commitment links directly to source signals and verbatim quotes.</p>
         </div>
         <div id="sourcesSummaryGrid" class="sources-summary-grid"></div>
         <div id="evidenceMatrixList" class="evidence-matrix-list"></div>
@@ -285,7 +263,7 @@
       <section id="audit" class="panel">
         <div class="panel-header">
           <h2>Audit &amp; Compliance Trail</h2>
-          <p class="text-secondary">Immutable log of queries, extracted scopes, and matched commitments.</p>
+          <p>Immutable log of queries, extracted intent scopes, and matched commitments.</p>
         </div>
         <div id="auditLogList" class="audit-log-list"></div>
       </section>
@@ -304,8 +282,8 @@
 
     <!-- Executive Footer -->
     <footer class="app-footer">
-      <div class="footer-left">AIONOS Executive Productivity Agent &bull; VP Sales Console &bull; Defensible Architecture</div>
-      <div class="footer-right">Data Pack Boundary: 100% Grounded &bull; Zero Invented Facts</div>
+      <div class="footer-left">AIONOS Executive Productivity Agent &bull; VP Sales Console</div>
+      <div class="footer-right">100% Grounded &bull; Zero Hallucinations</div>
     </footer>
   </div>
 

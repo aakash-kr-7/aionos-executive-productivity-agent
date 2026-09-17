@@ -1,11 +1,9 @@
 /**
  * AIONOS Executive OS — Frontend Client Application
- * Grounded action intelligence for Arjun Malhotra (VP Sales)
- * 
- * Answers the core executive question: "What do I need to know and do right now?"
+ * Clean, Tasteful, Minimalist Executive Console for Arjun Malhotra (VP Sales)
  */
 
-// Utility functions
+// Utilities
 const $ = selector => document.querySelector(selector);
 const $$ = selector => document.querySelectorAll(selector);
 
@@ -30,27 +28,7 @@ const state = {
   audit: null,
 };
 
-// Formatting helpers
-function formatActionType(type) {
-  switch (type) {
-    case 'my_action': return 'ACTION I OWE';
-    case 'waiting_on_other': return 'WAITING ON OTHER';
-    case 'unclear_ownership': return 'UNCLEAR OWNERSHIP';
-    default: return type.replace(/_/g, ' ').toUpperCase();
-  }
-}
-
-function formatStatus(status) {
-  switch (status) {
-    case 'due_today': return 'DUE TODAY';
-    case 'overdue': return 'OVERDUE';
-    case 'upcoming': return 'UPCOMING';
-    case 'completed': return 'COMPLETED';
-    case 'ambiguous': return 'AMBIGUOUS';
-    default: return status.toUpperCase();
-  }
-}
-
+// Human-friendly date/time helpers
 function formatDateDisplay(isoDate) {
   const d = new Date(isoDate + 'T00:00:00');
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -61,6 +39,44 @@ function formatDateDisplay(isoDate) {
   return `${dayName}, ${day} ${month} ${year}`;
 }
 
+function formatStatusLabel(status) {
+  switch (status) {
+    case 'due_today': return 'Due today';
+    case 'overdue': return 'Overdue';
+    case 'upcoming': return 'Upcoming';
+    case 'completed': return 'Completed';
+    case 'ambiguous': return 'Unclear';
+    default: return status;
+  }
+}
+
+function formatTime(isoOrTimeStr) {
+  if (!isoOrTimeStr) return '';
+  if (isoOrTimeStr.includes('T')) {
+    const parts = isoOrTimeStr.split('T')[1].split(':');
+    let h = parseInt(parts[0], 10);
+    const m = parts[1];
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${m} ${ampm}`;
+  }
+  return isoOrTimeStr;
+}
+
+function formatCleanDeadline(str) {
+  if (!str) return 'Unspecified';
+  const norm = str.replace('T', ' ');
+  if (norm.includes('2026-09-21 17:00')) return 'Mon 5:00 PM';
+  if (norm.includes('2026-09-22 17:00')) return 'Tue 5:00 PM';
+  if (norm.includes('2026-09-23 09:00')) return 'Wed 9:00 AM';
+  if (norm.includes('2026-09-23 15:00')) return 'Wed 3:00 PM';
+  if (norm.includes('2026-09-23 17:00')) return 'Wed 5:00 PM';
+  if (norm.includes('2026-09-24 09:30')) return 'Thu 9:30 AM';
+  if (norm.includes('2026-09-24 10:00')) return 'Thu 10:00 AM';
+  if (norm.includes('2026-09-25 17:00')) return 'Fri 5:00 PM';
+  return str;
+}
+
 // Data loading
 async function loadAll() {
   const dateDisplay = $('#activeDateDisplay');
@@ -68,7 +84,7 @@ async function loadAll() {
     dateDisplay.textContent = formatDateDisplay(state.activeDate);
   }
 
-  // Update date pills active state
+  // Update date pill active states
   $$('.date-pill').forEach(pill => {
     if (pill.dataset.date === state.activeDate) {
       pill.classList.add('active');
@@ -104,7 +120,7 @@ async function loadAll() {
   }
 }
 
-// 1. Executive Brief & Urgent Alert
+// 1. Executive Daily Brief
 function renderExecutiveBrief() {
   const summaryEl = $('#executiveSummary');
   if (summaryEl && state.brief) {
@@ -117,14 +133,14 @@ function renderExecutiveBrief() {
     if (overdue.length > 0) {
       alertBox.style.display = 'flex';
       const itemsStr = overdue.map(c => `<strong>${esc(c.subject)}</strong> (${esc(c.owner_display || 'Unassigned')})`).join(', ');
-      alertBox.innerHTML = `<span>&#9888;&#65039; <strong>CRITICAL DEADLINE ALERT:</strong> ${overdue.length} commitment(s) are overdue as of ${formatDateDisplay(state.activeDate)}: ${itemsStr}. Immediate follow-up required.</span>`;
+      alertBox.innerHTML = `<span><strong>Attention required:</strong> ${overdue.length} item(s) overdue as of ${formatDateDisplay(state.activeDate)}: ${itemsStr}.</span>`;
     } else {
       alertBox.style.display = 'none';
     }
   }
 }
 
-// 2. Metrics Ribbon (6 KPI Tiles)
+// 2. Metrics Ribbon (Calm, Unified Strip)
 function renderMetrics() {
   const m = state.brief.metrics;
   const metricsContainer = $('#metricsRibbon');
@@ -132,28 +148,28 @@ function renderMetrics() {
 
   metricsContainer.innerHTML = `
     <div class="metric-tile">
-      <div class="metric-value" style="color: var(--accent-cyan);">${m.my_actions}</div>
-      <div class="metric-label">MY ACTIONS</div>
+      <div class="metric-value">${m.my_actions}</div>
+      <div class="metric-label">My actions</div>
     </div>
     <div class="metric-tile">
-      <div class="metric-value" style="color: #a78bfa;">${m.waiting_on_others}</div>
-      <div class="metric-label">WAITING ON OTHERS</div>
+      <div class="metric-value">${m.waiting_on_others}</div>
+      <div class="metric-label">Waiting on others</div>
     </div>
     <div class="metric-tile">
-      <div class="metric-value" style="color: #fbbf24;">${m.unclear_ownership}</div>
-      <div class="metric-label">UNCLEAR OWNERSHIP</div>
+      <div class="metric-value">${m.unclear_ownership}</div>
+      <div class="metric-label">Unclear ownership</div>
     </div>
     <div class="metric-tile">
-      <div class="metric-value" style="color: var(--status-due-today);">${m.due_today}</div>
-      <div class="metric-label">DUE TODAY</div>
+      <div class="metric-value">${m.due_today}</div>
+      <div class="metric-label">Due today</div>
     </div>
     <div class="metric-tile">
-      <div class="metric-value" style="color: var(--status-overdue);">${m.overdue}</div>
-      <div class="metric-label">OVERDUE / URGENT</div>
+      <div class="metric-value" style="${m.overdue > 0 ? 'color: var(--status-overdue);' : ''}">${m.overdue}</div>
+      <div class="metric-label">Overdue</div>
     </div>
     <div class="metric-tile">
-      <div class="metric-value" style="color: var(--status-completed);">${m.completed}</div>
-      <div class="metric-label">COMPLETED</div>
+      <div class="metric-value">${m.completed}</div>
+      <div class="metric-label">Completed</div>
     </div>
   `;
 }
@@ -181,7 +197,6 @@ function renderActionQueues() {
 
   const cs = state.brief.commitments;
 
-  // Split into 4 logical executive buckets
   const myActions = cs.filter(c => c.action_type === 'my_action' && c.status !== 'completed');
   const waitingOnOthers = cs.filter(c => c.action_type === 'waiting_on_other' && c.status !== 'completed');
   const unclearOwnership = cs.filter(c => c.action_type === 'unclear_ownership');
@@ -190,25 +205,25 @@ function renderActionQueues() {
   let html = '';
 
   if (state.activeFilter === 'all' || state.activeFilter === 'my_action') {
-    html += renderQueueSection('⚡ MY ACTIONS &amp; COMMITMENTS I OWE', myActions, 'my_action', 'Direct actions required from Arjun Malhotra');
+    html += renderQueueSection('My Actions', myActions, 'my_action', 'Commitments owed by Arjun Malhotra');
   }
 
   if (state.activeFilter === 'all' || state.activeFilter === 'waiting_on_other') {
-    html += renderQueueSection('⏳ WAITING ON OTHERS (DEPENDENCIES)', waitingOnOthers, 'waiting_on_other', 'Deliverables owed to Arjun by colleagues');
+    html += renderQueueSection('Waiting on Others', waitingOnOthers, 'waiting_on_other', 'Deliverables owed to Arjun by colleagues');
   }
 
   if (state.activeFilter === 'all' || state.activeFilter === 'unclear_ownership') {
-    html += renderQueueSection('⚠️ OWNERSHIP AMBIGUITIES &amp; UNRESOLVED', unclearOwnership, 'unclear_ownership', 'Action items where ownership is contested or unassigned — system strictly refuses to invent an owner');
+    html += renderQueueSection('Unclear Ownership', unclearOwnership, 'unclear_ownership', 'Unassigned items — ownership is unresolved in source data');
   }
 
   if (state.activeFilter === 'all' || state.activeFilter === 'completed') {
-    html += renderQueueSection('✅ RECENTLY COMPLETED COMMITMENTS', completed, 'completed', 'Verified finished deliverables during the exercise week');
+    html += renderQueueSection('Recently Completed', completed, 'completed', 'Deliverables completed during the exercise window');
   }
 
   if (!html.trim()) {
     html = `
-      <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 36px; text-align: center; color: var(--text-muted);">
-        No commitments match the active filter (<strong>${esc(state.activeFilter)}</strong>) as of ${formatDateDisplay(state.activeDate)}.
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 32px; text-align: center; color: var(--text-muted); font-size: 13px;">
+        No commitments match the active filter (${esc(state.activeFilter)}) as of ${formatDateDisplay(state.activeDate)}.
       </div>
     `;
   }
@@ -231,17 +246,15 @@ function renderQueueSection(title, items, typeKey, subtext) {
   return `
     <section class="queue-section">
       <div class="queue-section-header">
-        <div>
-          <div class="queue-section-title">
-            <span>${title}</span>
-            <span class="queue-count-pill">${items.length}</span>
-          </div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${subtext}</div>
+        <div class="queue-section-title">
+          <span>${title}</span>
+          <span class="queue-count-pill">${items.length}</span>
         </div>
+        <div style="font-size: 11px; color: var(--text-muted);">${subtext}</div>
       </div>
       <div class="action-cards">
         ${items.length === 0 
-          ? `<div style="background: var(--bg-panel); border: 1px dashed var(--border-subtle); border-radius: var(--radius-sm); padding: 18px; text-align: center; color: var(--text-muted); font-size: 12px;">No active items in this category as of today.</div>`
+          ? `<div style="background: var(--bg-panel); border: 1px dashed var(--border-subtle); border-radius: var(--radius-xs); padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px;">No active items in this category.</div>`
           : items.map(c => renderCommitmentCard(c)).join('')
         }
       </div>
@@ -256,30 +269,25 @@ function renderCommitmentCard(c) {
         ? 'card-due-today' 
         : (c.action_type === 'unclear_ownership' ? 'card-ambiguous' : ''));
 
-  const statusBadge = `<span class="badge badge-${c.status}">${formatStatus(c.status)}</span>`;
-  const actionTypeBadge = `<span class="badge badge-${c.action_type}">${formatActionType(c.action_type)}</span>`;
+  // Clean status pills
+  const statusPill = `<span class="status-pill status-${c.status}"><span class="status-dot"></span>${formatStatusLabel(c.status)}</span>`;
   
-  let ownershipBadge = '';
+  let unassignedPill = '';
   if (c.action_type === 'unclear_ownership') {
-    ownershipBadge = `<span class="badge badge-unassigned">OWNERSHIP UNRESOLVED &bull; REFUSED TO GUESS</span>`;
+    unassignedPill = `<span class="status-pill status-unassigned"><span class="status-dot"></span>Unassigned ownership</span>`;
   }
 
-  const ownerDisplay = c.owner_display 
-    ? `<strong>${esc(c.owner_display)}</strong>` 
-    : `<span style="color:#fde047; font-weight:700;">UNASSIGNED (FLAGGED)</span>`;
+  const ownerText = c.owner_display 
+    ? esc(c.owner_display) 
+    : '<span style="color:#fbbf24; font-weight:600;">Unassigned (No owner in data)</span>';
 
-  const counterpartyDisplay = c.counterparty 
-    ? `<strong>${esc(c.counterparty)}</strong>` 
-    : '<span>None / Team</span>';
+  const counterpartyText = c.counterparty ? esc(c.counterparty) : 'Team';
+  const deadlineText = c.deadline_label ? esc(c.deadline_label) : 'Unspecified';
 
-  const deadlineDisplay = c.deadline_label 
-    ? `<strong>${esc(c.deadline_label)}</strong>` 
-    : '<span style="color:var(--text-muted);">None specified</span>';
-
-  // Source badges
+  // Source tags
   const sourceTypes = (c.reconciliation && c.reconciliation.source_types_involved) || 
     [...new Set(c.evidence.map(e => e.source_type))];
-  const sourceTagsHtml = sourceTypes.map(st => `<span class="source-tag-item">${st.toUpperCase()}</span>`).join('');
+  const sourceTagsHtml = sourceTypes.map(st => `<span class="source-tag">${st}</span>`).join('');
 
   // Slippage notice
   let slippageHtml = '';
@@ -288,22 +296,18 @@ function renderCommitmentCard(c) {
     const latest = c.deadline_history[c.deadline_history.length - 1];
     slippageHtml = `
       <div class="slippage-notice">
-        <span>&#9201;</span>
-        <span><strong>Deadline Slippage Detected:</strong> ${esc(first.new_deadline)} &rarr; ${esc(latest.new_deadline)} (${esc(latest.reason || 'Per subsequent thread')})</span>
+        <span>Deadline revised from ${formatCleanDeadline(first.new_deadline)} to ${formatCleanDeadline(latest.new_deadline)} (${esc(latest.reason || 'Per thread')})</span>
       </div>
     `;
   }
-
-  const confPercent = Math.round(c.confidence * 100);
 
   return `
     <article class="action-card ${cardClassModifier}" data-id="${esc(c.id)}">
       <div class="card-header">
         <div class="card-subject">${esc(c.subject)}</div>
         <div class="card-badges">
-          ${ownershipBadge}
-          ${actionTypeBadge}
-          ${statusBadge}
+          ${unassignedPill}
+          ${statusPill}
         </div>
       </div>
 
@@ -312,26 +316,21 @@ function renderCommitmentCard(c) {
       ${slippageHtml}
 
       <div class="card-meta-line">
-        <div class="meta-segment">Owner: ${ownerDisplay}</div>
-        <div class="meta-segment">&bull;</div>
-        <div class="meta-segment">Counterparty: ${counterpartyDisplay}</div>
-        <div class="meta-segment">&bull;</div>
-        <div class="meta-segment">Deadline: ${deadlineDisplay}</div>
-        <div class="meta-segment">&bull;</div>
-        <div class="meta-segment">
-          <div class="source-icons-tag">${sourceTagsHtml}</div>
-        </div>
+        <span>Owner: <strong>${ownerText}</strong></span>
+        <span class="meta-dot">&bull;</span>
+        <span>Counterparty: <strong>${counterpartyText}</strong></span>
+        <span class="meta-dot">&bull;</span>
+        <span>Deadline: <strong>${deadlineText}</strong></span>
+        <span class="meta-dot">&bull;</span>
+        <span class="source-tags-container">${sourceTagsHtml}</span>
       </div>
 
       <div class="card-footer">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary);">
-          <span>Confidence: <strong>${confPercent}%</strong></span>
-          <div style="width: 50px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;">
-            <div style="width: ${confPercent}%; height: 100%; background: var(--accent-cyan);"></div>
-          </div>
+        <div style="font-size: 11px; color: var(--text-muted);">
+          Grounded confidence: <strong>${Math.round(c.confidence * 100)}%</strong>
         </div>
         <button class="btn-inspect" data-id="${esc(c.id)}">
-          <span>Inspect Evidence &amp; History</span>
+          <span>View evidence &amp; history</span>
           <span>&rarr;</span>
         </button>
       </div>
@@ -339,7 +338,7 @@ function renderCommitmentCard(c) {
   `;
 }
 
-// 5. Drill-down Modal (Defensible Evidence & Lineage)
+// 5. Drill-Down Modal (Evidence & Defensibility)
 function openDrilldownModal(commitmentId) {
   const modal = $('#drilldownModal');
   const subjectEl = $('#modalSubject');
@@ -349,7 +348,7 @@ function openDrilldownModal(commitmentId) {
   const c = state.brief.commitments.find(item => item.id === commitmentId);
   if (!c) return;
 
-  subjectEl.innerHTML = `<span>${esc(c.subject)}</span> <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">(ID: ${esc(c.id)})</span>`;
+  subjectEl.innerHTML = `<span>${esc(c.subject)}</span> <span style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: 8px;">(${esc(c.id)})</span>`;
 
   // Evidence quotes
   const evidenceHtml = c.evidence.map(e => `
@@ -360,21 +359,21 @@ function openDrilldownModal(commitmentId) {
   `).join('');
 
   // Deadline revision history
-  let historyHtml = '<div style="color: var(--text-muted); font-size: 12px;">No revisions recorded; single authoritative deadline.</div>';
+  let historyHtml = '<div style="color: var(--text-muted); font-size: 12px;">No deadline revisions recorded.</div>';
   if (c.deadline_history && c.deadline_history.length > 0) {
     historyHtml = `
-      <div style="display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; flex-direction: column; gap: 6px;">
         ${c.deadline_history.map((rev, idx) => `
-          <div style="background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 4px; border-left: 2px solid ${idx === c.deadline_history.length - 1 ? 'var(--accent-cyan)' : 'var(--border-subtle)'};">
-            <div style="font-size: 12px; font-weight: 700; color: #fff;">Revision ${idx + 1} (${esc(rev.revised_at)}): <strong>${esc(rev.new_deadline)}</strong></div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Source: <code>${esc(rev.source_id)}</code> &bull; Reason: ${esc(rev.reason || 'Stated deliverable requirement')}</div>
+          <div style="background: var(--bg-panel-elevated); padding: 8px 12px; border-radius: var(--radius-xs); border-left: 2px solid ${idx === c.deadline_history.length - 1 ? 'var(--accent-primary)' : 'var(--border-subtle)'};">
+            <div style="font-size: 12px; font-weight: 600; color: #fff;">Revision ${idx + 1} (${esc(rev.revised_at)}): <strong>${esc(rev.new_deadline)}</strong></div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Source: <code>${esc(rev.source_id)}</code> &bull; Reason: ${esc(rev.reason || 'Requirement stated in source')}</div>
           </div>
         `).join('')}
       </div>
     `;
   }
 
-  // Classification Rationale
+  // Rationale
   const rationaleHtml = `
     <ul style="padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #cbd5e1;">
       ${c.rationale.map(r => `<li>${esc(r)}</li>`).join('')}
@@ -383,46 +382,45 @@ function openDrilldownModal(commitmentId) {
 
   // Pipeline Trace
   const traceHtml = (c.extraction_trace && c.extraction_trace.length > 0) ? `
-    <div style="background: #040810; padding: 10px 12px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: #93c5fd; max-height: 140px; overflow-y: auto;">
+    <div style="background: #06080d; padding: 10px 12px; border-radius: var(--radius-xs); font-family: var(--font-mono); font-size: 11px; color: #94a3b8; max-height: 120px; overflow-y: auto;">
       ${c.extraction_trace.map(t => `<div>&gt; ${esc(t)}</div>`).join('')}
     </div>
-  ` : '<div style="color: var(--text-muted); font-size: 12px;">Standard deterministic extraction pipeline executed.</div>';
+  ` : '<div style="color: var(--text-muted); font-size: 12px;">Standard deterministic extraction executed.</div>';
 
   bodyEl.innerHTML = `
     <!-- Summary Header -->
-    <div style="background: var(--bg-panel-elevated); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-      <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">${esc(c.action)}</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; color: var(--text-secondary);">
-        <div>Status: <span class="badge badge-${c.status}">${formatStatus(c.status)}</span></div>
-        <div>Type: <span class="badge badge-${c.action_type}">${formatActionType(c.action_type)}</span></div>
-        <div>Owner: <strong>${c.owner_display || '<span style="color:#fde047;">UNASSIGNED (REFUSED TO GUESS)</span>'}</strong></div>
+    <div style="background: var(--bg-panel-elevated); padding: 14px 16px; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle);">
+      <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 8px;">${esc(c.action)}</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-secondary);">
+        <div>Status: <span class="status-pill status-${c.status}"><span class="status-dot"></span>${formatStatusLabel(c.status)}</span></div>
+        <div>Owner: <strong>${c.owner_display || '<span style="color:#fbbf24;">Unassigned</span>'}</strong></div>
         <div>Counterparty: <strong>${esc(c.counterparty || '—')}</strong></div>
-        <div>Current Deadline: <strong>${esc(c.deadline_label || 'None')}</strong></div>
+        <div>Deadline: <strong>${esc(c.deadline_label || 'None')}</strong></div>
         <div>Confidence: <strong>${Math.round(c.confidence * 100)}%</strong></div>
       </div>
     </div>
 
-    <!-- Section 1: Multi-Source Evidence Quotes -->
+    <!-- Section 1: Grounded Source Evidence -->
     <div class="drilldown-section">
-      <div class="drilldown-title">&#128196; MULTI-SOURCE CORROBORATING EVIDENCE (${c.evidence.length} CITATIONS)</div>
+      <div class="drilldown-title">Source Citations (${c.evidence.length})</div>
       ${evidenceHtml}
     </div>
 
-    <!-- Section 2: Chronological Deadline History & Slippage -->
+    <!-- Section 2: Chronological Revision History -->
     <div class="drilldown-section">
-      <div class="drilldown-title">&#9201; CHRONOLOGICAL DEADLINE TIMELINE &amp; SLIPPAGE HISTORY</div>
+      <div class="drilldown-title">Deadline Slippage &amp; Revision History</div>
       ${historyHtml}
     </div>
 
-    <!-- Section 3: Deterministic Classification Rationale -->
+    <!-- Section 3: Deterministic Classification Defense -->
     <div class="drilldown-section">
-      <div class="drilldown-title">&#9881; DETERMINISTIC CLASSIFICATION RATIONALE</div>
+      <div class="drilldown-title">Classification Rationale</div>
       ${rationaleHtml}
     </div>
 
     <!-- Section 4: Pipeline Extraction Trace -->
     <div class="drilldown-section">
-      <div class="drilldown-title">&#128065; STAGE EXECUTION TRACE</div>
+      <div class="drilldown-title">Extraction Pipeline Trace</div>
       ${traceHtml}
     </div>
   `;
@@ -435,29 +433,29 @@ function closeDrilldownModal() {
   if (modal) modal.style.display = 'none';
 }
 
-// 6. Today's Meetings & Schedule
+// 6. Schedule & Meetings
 function renderMeetings() {
   const meetings = state.brief.meetings || [];
   const countTag = $('#meetingCountTag');
   const container = $('#todayMeetingsList');
 
   if (countTag) {
-    countTag.textContent = `${meetings.length} Scheduled`;
+    countTag.textContent = `${meetings.length} Events`;
   }
 
   if (!container) return;
 
   if (meetings.length === 0) {
     container.innerHTML = `
-      <div style="background: var(--bg-panel-elevated); padding: 14px; border-radius: var(--radius-sm); text-align: center; color: var(--text-muted); font-size: 12px;">
-        No calendar meetings scheduled for ${formatDateDisplay(state.activeDate)}.
+      <div style="padding: 12px 0; color: var(--text-muted); font-size: 12px;">
+        No calendar meetings scheduled for this date.
       </div>
     `;
     return;
   }
 
   container.innerHTML = meetings.map(m => `
-    <div class="meeting-item ${m.title.toLowerCase().includes('hold') ? 'blocked' : ''}">
+    <div class="meeting-item active-day">
       <div class="meeting-time">${esc(m.start)} – ${esc(m.end)}</div>
       <div class="meeting-title">${esc(m.title)}</div>
     </div>
@@ -483,37 +481,36 @@ function renderTimeline() {
     const isToday = day.date === state.activeDate;
     const isPast = day.date < state.activeDate;
 
-    // Filter commitments associated with this day
     const dayCommitments = cs.filter(c => {
       if (c.deadline && c.deadline.startsWith(day.date)) return true;
-      if (day.date === '2026-09-25' && c.subject.toLowerCase().includes('lease')) return true; // lease is Friday EOD
+      if (day.date === '2026-09-25' && c.subject.toLowerCase().includes('lease')) return true;
       return false;
     });
 
     return `
-      <div class="timeline-day-block" style="${isToday ? 'border-color: var(--accent-cyan); background: #0c182c;' : ''}">
+      <div class="timeline-day-block" style="${isToday ? 'border-color: var(--border-medium); background: var(--bg-panel-elevated);' : ''}">
         <div class="timeline-day-header" style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span>${esc(day.name)}</span>
-            ${isToday ? '<span class="badge" style="background: var(--accent-cyan); color: #06111f; font-weight: 800;">CURRENT AS-OF DATE</span>' : ''}
-            ${isPast ? '<span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">HISTORICAL</span>' : ''}
+            ${isToday ? '<span class="status-pill status-upcoming"><span class="status-dot"></span>Today</span>' : ''}
+            ${isPast ? '<span style="font-size: 11px; color: var(--text-muted);">(Past)</span>' : ''}
           </div>
-          <span style="font-size: 11px; color: var(--text-muted);">${dayCommitments.length} key commitment(s)</span>
+          <span style="font-size: 11px; color: var(--text-muted);">${dayCommitments.length} commitment(s)</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
           ${dayCommitments.length === 0 
-            ? `<div style="font-size: 12px; color: var(--text-muted); padding: 6px 0;">No milestone commitments due on this date.</div>` 
+            ? `<div style="font-size: 12px; color: var(--text-muted); padding: 4px 0;">No milestone deadlines on this date.</div>` 
             : dayCommitments.map(c => `
-              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); padding: 10px 14px; border-radius: var(--radius-sm); border-left: 3px solid ${c.status === 'overdue' ? 'var(--status-overdue)' : (c.status === 'completed' ? 'var(--status-completed)' : 'var(--accent-cyan)')};">
+              <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); padding: 10px 14px; border-radius: var(--radius-xs); border: 1px solid var(--border-subtle); border-left: 3px solid ${c.status === 'overdue' ? 'var(--status-overdue)' : (c.status === 'completed' ? 'var(--status-completed)' : 'var(--border-medium)')};">
                 <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 13px;">${esc(c.subject)}</div>
+                  <div style="font-weight: 600; color: #fff; font-size: 13px;">${esc(c.subject)}</div>
                   <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">${esc(c.action)}</div>
                   <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Owner: <strong>${c.owner_display || 'Unassigned'}</strong> &bull; Deadline: <strong>${esc(c.deadline_label || 'Unspecified')}</strong></div>
                 </div>
-                <div style="display: flex; gap: 6px;">
-                  <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
-                  <button class="btn-inspect" data-id="${esc(c.id)}">Details</button>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="status-pill status-${c.status}"><span class="status-dot"></span>${formatStatusLabel(c.status)}</span>
+                  <button class="btn-inspect" data-id="${esc(c.id)}">Details &rarr;</button>
                 </div>
               </div>
             `).join('')
@@ -523,7 +520,7 @@ function renderTimeline() {
     `;
   }).join('');
 
-  // Bind inspect buttons inside timeline
+  // Bind inspect buttons
   container.querySelectorAll('.btn-inspect').forEach(btn => {
     btn.addEventListener('click', () => {
       openDrilldownModal(btn.dataset.id);
@@ -531,7 +528,7 @@ function renderTimeline() {
   });
 }
 
-// 8. 8-Stage Pipeline Inspector
+// 8. Pipeline Inspector
 function renderPipelineTrace() {
   if (!state.trace) return;
 
@@ -540,9 +537,9 @@ function renderPipelineTrace() {
   const statGrp = $('#statGroups');
   const pre = $('#pipelineTracePre');
 
-  if (statSig) statSig.textContent = `${state.trace.signal_count} Signals Normalized`;
-  if (statCand) statCand.textContent = `${state.trace.candidate_count} Candidates Extracted`;
-  if (statGrp) statGrp.textContent = `${state.trace.reconciled_count} Groups Reconciled`;
+  if (statSig) statSig.textContent = `${state.trace.signal_count} Signals`;
+  if (statCand) statCand.textContent = `${state.trace.candidate_count} Candidates`;
+  if (statGrp) statGrp.textContent = `${state.trace.reconciled_count} Clusters`;
 
   if (pre) {
     pre.textContent = JSON.stringify(state.trace, null, 2);
@@ -561,19 +558,19 @@ function renderEvidenceMatrix() {
     grid.innerHTML = `
       <div class="metric-tile">
         <div class="metric-value">${s.email_threads}</div>
-        <div class="metric-label">EMAIL THREADS</div>
+        <div class="metric-label">Email threads</div>
       </div>
       <div class="metric-tile">
         <div class="metric-value">${s.voice_notes}</div>
-        <div class="metric-label">VOICE MEMOS</div>
+        <div class="metric-label">Voice memos</div>
       </div>
       <div class="metric-tile">
         <div class="metric-value">${s.calendar_people}</div>
-        <div class="metric-label">CALENDARS INDEXED</div>
+        <div class="metric-label">Calendars indexed</div>
       </div>
       <div class="metric-tile">
         <div class="metric-value">${s.people.length}</div>
-        <div class="metric-label">CANONICAL DIRECTORY</div>
+        <div class="metric-label">People directory</div>
       </div>
     `;
   }
@@ -581,17 +578,14 @@ function renderEvidenceMatrix() {
   if (list) {
     list.innerHTML = state.brief.commitments.map(c => `
       <div class="matrix-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <h3 style="color: #fff; font-size: 15px; font-weight: 800;">${esc(c.subject)}</h3>
-          <div style="display: flex; gap: 6px;">
-            <span class="badge badge-${c.action_type}">${formatActionType(c.action_type)}</span>
-            <span class="badge badge-${c.status}">${formatStatus(c.status)}</span>
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <h3 style="color: #fff; font-size: 14px; font-weight: 700;">${esc(c.subject)}</h3>
+          <span class="status-pill status-${c.status}"><span class="status-dot"></span>${formatStatusLabel(c.status)}</span>
         </div>
 
-        <div style="font-size: 13px; color: #e2e8f0; margin-bottom: 12px;"><strong>Canonical action:</strong> ${esc(c.action)}</div>
+        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;"><strong>Action:</strong> ${esc(c.action)}</div>
 
-        <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
           ${c.evidence.map(e => `
             <div class="evidence-block">
               <div class="evidence-source-title">${esc(e.source_type.toUpperCase())} &bull; ${esc(e.title)} (${esc(e.date)})</div>
@@ -604,7 +598,7 @@ function renderEvidenceMatrix() {
   }
 }
 
-// 10. Audit Trail Panel
+// 10. Audit Trail
 function renderAudit() {
   if (!state.audit) return;
   const list = $('#auditLogList');
@@ -613,8 +607,8 @@ function renderAudit() {
   const events = state.audit.events || [];
   if (events.length === 0) {
     list.innerHTML = `
-      <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 28px; text-align: center; color: var(--text-muted); font-size: 13px;">
-        No grounded queries logged yet. Use the "Ask the Agent" console to record an auditable interaction.
+      <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: var(--radius-xs); padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px;">
+        No grounded queries logged yet. Use the "Ask the Agent" input to record an auditable query.
       </div>
     `;
     return;
@@ -622,19 +616,19 @@ function renderAudit() {
 
   list.innerHTML = events.map(ev => `
     <div class="audit-entry">
-      <div style="display: flex; justify-content: space-between; color: var(--accent-cyan); font-weight: 700; margin-bottom: 4px;">
-        <span>AUDIT ID: ${esc(ev.id)}</span>
-        <span>AS-OF: ${esc(ev.as_of)}</span>
+      <div style="display: flex; justify-content: space-between; color: var(--accent-primary); font-weight: 600; margin-bottom: 4px;">
+        <span>EVENT ID: ${esc(ev.id)}</span>
+        <span>AS OF: ${esc(ev.as_of)}</span>
       </div>
-      <div style="color: #fff; font-weight: 600; margin-bottom: 4px;">Question: &ldquo;${esc(ev.question)}&rdquo;</div>
-      <div style="color: var(--text-secondary); font-size: 11px;">
-        Intent Type: <code>${esc(ev.type)}</code> &bull; Matched Commitment IDs: [${esc((ev.matched_commitments || []).join(', ') || 'None')}]
+      <div style="color: #fff; font-weight: 500; margin-bottom: 3px;">Question: &ldquo;${esc(ev.question)}&rdquo;</div>
+      <div style="color: var(--text-muted); font-size: 11px;">
+        Intent: <code>${esc(ev.type)}</code> &bull; Matched IDs: [${esc((ev.matched_commitments || []).join(', ') || 'None')}]
       </div>
     </div>
   `).reverse().join('');
 }
 
-// 11. Grounded Q&A Assistant Execution
+// 11. Grounded Q&A Assistant
 async function askQuestion(queryText) {
   const input = $('#qaInput');
   if (queryText) {
@@ -647,7 +641,7 @@ async function askQuestion(queryText) {
   if (!resultBox) return;
 
   resultBox.style.display = 'block';
-  resultBox.innerHTML = `<div style="color: var(--accent-cyan); font-weight: 600; font-size: 13px;">Consulting deterministic evidence graph as of ${state.activeDate}…</div>`;
+  resultBox.innerHTML = `<div style="color: var(--text-secondary); font-size: 12px;">Consulting deterministic evidence graph as of ${state.activeDate}…</div>`;
 
   try {
     const res = await fetch('/api/query', {
@@ -665,11 +659,11 @@ async function askQuestion(queryText) {
     let evidenceHtml = '';
     if (data.evidence && data.evidence.length > 0) {
       evidenceHtml = `
-        <details style="margin-top: 10px; cursor: pointer;">
-          <summary style="font-size: 11px; font-weight: 700; color: var(--accent-cyan);">View Grounded Source Evidence (${data.evidence.length} Citations) &bull; Audit ID: ${esc(data.audit_id)}</summary>
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px;">
+        <details style="margin-top: 8px; cursor: pointer;">
+          <summary style="font-size: 11px; font-weight: 600; color: var(--accent-primary);">Source Citations (${data.evidence.length}) &bull; Audit ID: ${esc(data.audit_id)}</summary>
+          <div style="margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
             ${data.evidence.map(e => `
-              <div class="evidence-block">
+              <div class="evidence-block" style="padding: 6px 10px;">
                 <div class="evidence-source-title">${esc(e.title)} (${esc(e.date)})</div>
                 <div class="evidence-quote-text">&ldquo;${esc(e.excerpt)}&rdquo;</div>
               </div>
@@ -690,7 +684,7 @@ async function askQuestion(queryText) {
     state.audit = await auditRes.json();
     renderAudit();
   } catch (err) {
-    resultBox.innerHTML = `<div style="color: var(--status-overdue); font-size: 13px;">Error querying agent: ${esc(err.message)}</div>`;
+    resultBox.innerHTML = `<div style="color: var(--status-overdue); font-size: 12px;">Error querying agent: ${esc(err.message)}</div>`;
   }
 }
 
@@ -726,14 +720,14 @@ function setupEvents() {
     });
   });
 
-  // Fast Query Chips
+  // Quick Query Chips
   $$('.chip-btn').forEach(chip => {
     chip.addEventListener('click', () => {
       askQuestion(chip.dataset.query);
     });
   });
 
-  // Ask Button & Enter Key in QA input
+  // Ask Button & Enter Key
   const submitBtn = $('#qaSubmitBtn');
   const qaInput = $('#qaInput');
   if (submitBtn) {
@@ -748,7 +742,7 @@ function setupEvents() {
     });
   }
 
-  // Trace Refresh Button
+  // Refresh Trace
   const refreshTraceBtn = $('#refreshTraceBtn');
   if (refreshTraceBtn) {
     refreshTraceBtn.addEventListener('click', async () => {
@@ -758,7 +752,7 @@ function setupEvents() {
     });
   }
 
-  // Modal Close Button & Backdrop Click
+  // Modal Close & Backdrop
   const closeBtn = $('#modalCloseBtn');
   const modal = $('#drilldownModal');
   if (closeBtn) {
@@ -772,7 +766,7 @@ function setupEvents() {
     });
   }
 
-  // Escape key to close modal
+  // Escape to close modal
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       closeDrilldownModal();
@@ -780,7 +774,7 @@ function setupEvents() {
   });
 }
 
-// App Initialization
+// Initialization
 document.addEventListener('DOMContentLoaded', () => {
   setupEvents();
   loadAll();
