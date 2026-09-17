@@ -124,7 +124,16 @@ async function loadAll() {
 function renderExecutiveBrief() {
   const summaryEl = $('#executiveSummary');
   if (summaryEl && state.brief) {
-    summaryEl.textContent = state.brief.executive_summary || 'All commitments are on schedule with no urgent blockers.';
+    const rawText = state.brief.executive_summary || 'All commitments are on schedule with no urgent blockers.';
+    const sentences = rawText.split('. ').filter(s => s.trim().length > 0);
+    
+    if (sentences.length > 1) {
+      summaryEl.innerHTML = `<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; color: var(--text-primary); font-size: 15px; font-weight: 400;">` + 
+        sentences.map(s => `<li>${esc(s)}${s.endsWith('.') ? '' : '.'}</li>`).join('') + 
+        `</ul>`;
+    } else {
+      summaryEl.textContent = rawText;
+    }
   }
 
   const alertBox = $('#urgentAlertBox');
